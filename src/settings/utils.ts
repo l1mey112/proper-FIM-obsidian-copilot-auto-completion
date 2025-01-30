@@ -1,10 +1,9 @@
 import {DEFAULT_SETTINGS, PluginData, Settings, settingsSchema} from "./versions";
 import {z, ZodError, ZodIssueCode, ZodType} from 'zod';
 import {cloneDeep, each, get, has, isArray, isEqual, isNumber, isObject, isString, set, unset} from "lodash";
-import {isSettingsV0, isSettingsV1, migrateFromV0ToV1} from "./versions/migration";
+import {isSettingsV1} from "./versions/migration";
 import {err, ok, Result} from "neverthrow";
 import * as mm from "micromatch";
-
 
 type JSONObject = Record<string, any>;
 
@@ -151,10 +150,6 @@ export function deserializeSettings(data: JSONObject | null | undefined): Result
         settings = data.settings;
     }
 
-    if (isSettingsV0(settings)) {
-        console.log("Migrating settings from v0 to v1");
-        settings = migrateFromV0ToV1(settings);
-    }
     if (!isSettingsV1(settings)) {
         console.log("Fixing settings structure and value errors");
         return fixStructureAndValueErrors(settingsSchema, settings, DEFAULT_SETTINGS);

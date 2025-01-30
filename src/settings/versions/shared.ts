@@ -14,21 +14,10 @@ export const MIN_FREQUENCY_PENALTY = 0;
 export const MAX_FREQUENCY_PENALTY = 2;
 export const MIN_PRESENCE_PENALTY = 0;
 export const MAX_PRESENCE_PENALTY = 2;
-
-
-export const azureOAIApiSettingsSchema = z.object({
-    key: z.string(),
-    url: z.string().url().or(z.string().max(0)),
-}).strict();
-
-export const openAIApiSettingsSchema = z.object({
-    key: z.string(),
-    url: z.string().url(),
-    model: z.string(),
-}).strict();
+export const MIN_NUM_CTX = 128;
 
 export const ollamaApiSettingsSchema = z.object({
-    url: z.string().url(),
+    host: z.string(),
     model: z.string(),
 }).strict();
 
@@ -45,13 +34,6 @@ export const modelOptionsSchema = z.object({
     presence_penalty: z.number().min(MIN_PRESENCE_PENALTY, {message: `Presence penalty must be at least ${MIN_PRESENCE_PENALTY}`}).max(MAX_PRESENCE_PENALTY, {message: `Presence penalty must be at most ${MAX_PRESENCE_PENALTY}`}),
     max_tokens: z.number().int()
         .min(MIN_MAX_TOKENS, {message: `max_tokens must be at least than ${MIN_MAX_TOKENS}`}).max(MAX_MAX_TOKENS, {message: `max_tokens must be at most ${MAX_MAX_TOKENS}`}),
+    num_ctx: z.number().int()
+        .min(128),
 }).strict();
-
-export const fewShotExampleSchema = z.object({
-    // TODO: figure out how to make this compatible with the context enum and its namespace.
-    context: z.enum(["Text", "Heading", "BlockQuotes", "UnorderedList", "NumberedList", "CodeBlock", "MathBlock", "TaskList"]),
-    input: z.string().min(3, {message: "The Input must be at least 3 characters long"}),
-    answer: z.string().min(3, {message: "The Answer must be at least 3 characters long"}),
-}).strict();
-
-export type FewShotExample = z.infer<typeof fewShotExampleSchema>;

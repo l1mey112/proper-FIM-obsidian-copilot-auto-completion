@@ -1,11 +1,17 @@
 import Context from "../context_detection";
 import {Result} from "neverthrow";
 
+export type PredictionResponse = Result<string | null, Error>
+export type PredictionCancelable = {
+    promise: Promise<PredictionResponse>;
+    abort: () => void;
+};
+
 export interface PredictionService {
     fetchPredictions(
         prefix: string,
         suffix: string
-    ): Promise<Result<string, Error>>;
+    ): Promise<PredictionCancelable>;
 }
 
 export interface PostProcessor {
@@ -42,15 +48,11 @@ export type UserMessageFormatter = (
     inputs: UserMessageFormattingInputs
 ) => string;
 
-export interface ApiClient {
-    queryChatModel(messages: ChatMessage[]): Promise<Result<string, Error>>;
-    checkIfConfiguredCorrectly(): Promise<string[]>;
-}
-
 export interface ModelOptions {
     temperature: number;
     top_p: number;
     frequency_penalty: number;
     presence_penalty: number;
     max_tokens: number;
+    num_ctx: number;
 }

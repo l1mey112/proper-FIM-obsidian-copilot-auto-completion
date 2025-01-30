@@ -8,7 +8,7 @@ import InitState from "./states/init_state";
 import IdleState from "./states/idle_state";
 import SuggestingState from "./states/suggesting_state";
 import {PredictionService} from "./prediction_services/types";
-import ChatGPTWithReasoning from "./prediction_services/chat_gpt_with_reasoning";
+import FIM from "./prediction_services/FIM";
 import {checkForErrors} from "./settings/utils";
 import Context from "./context_detection";
 import {Settings} from "./settings/versions";
@@ -296,7 +296,7 @@ class EventListener implements EventHandler, SettingsObserver {
 }
 
 function createPredictionService(settings: Settings) {
-    return ChatGPTWithReasoning.fromSettings(settings);
+    return FIM.fromSettings(settings);
 }
 
 export default EventListener;

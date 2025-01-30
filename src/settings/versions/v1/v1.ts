@@ -1,28 +1,3 @@
-import block_qoute_example
-    from "./few_shot_examples/block_qoute_example";
-import codeblock_function_completion
-    from "./few_shot_examples/codeblock_function_completion";
-import codeblock_function_parameters
-    from "./few_shot_examples/codeblock_function_parameters";
-import header_example from "./few_shot_examples/header_example";
-import numbered_list_example
-    from "./few_shot_examples/numbered_list_example";
-import sub_task_list_example
-    from "./few_shot_examples/sub_task_list_example";
-import task_list_example from "./few_shot_examples/task_list_example";
-import text_completion_end
-    from "./few_shot_examples/text_completion_end";
-import text_completion_middle
-    from "./few_shot_examples/text_completion_middle";
-import unordered_list_pro_and_con_list
-    from "./few_shot_examples/unordered_list_pro_and_con_list";
-import unordered_list_solid
-    from "./few_shot_examples/unordered_list_solid";
-import math_block_inline from "./few_shot_examples/math_block_inline";
-import math_block_multi_line
-    from "./few_shot_examples/math_block_multi_line";
-import header_example_relu
-    from "./few_shot_examples/header_example_relu";
 import {
     MAX_DELAY,
     MAX_MAX_CHAR_LIMIT,
@@ -31,7 +6,7 @@ import {
     ollamaApiSettingsSchema,
 } from "../shared";
 import {z} from "zod";
-import {azureOAIApiSettingsSchema, fewShotExampleSchema, modelOptionsSchema, openAIApiSettingsSchema} from "../shared";
+import {modelOptionsSchema} from "../shared";
 import {isRegexValid, isValidIgnorePattern} from "../../utils";
 
 export const triggerSchema = z.object({
@@ -61,17 +36,12 @@ export const settingsSchema = z.object({
     version: z.literal("1"),
     enabled: z.boolean(),
     advancedMode: z.boolean(),
-    apiProvider: z.enum(['azure', 'openai', "ollama"]),
-    azureOAIApiSettings: azureOAIApiSettingsSchema,
-    openAIApiSettings: openAIApiSettingsSchema,
+    apiProvider: z.enum(['ollama']),
     ollamaApiSettings: ollamaApiSettingsSchema,
     triggers: z.array(triggerSchema),
     delay: z.number().int().min(MIN_DELAY, {message: "Delay must be between 0ms and 2000ms"}).max(MAX_DELAY, {message: "Delay must be between 0ms and 2000ms"}),
     modelOptions: modelOptionsSchema,
     systemMessage: z.string().min(3, {message: "System message must be at least 3 characters long"}),
-    fewShotExamples: z.array(fewShotExampleSchema),
-    userMessageTemplate: z.string().min(3, {message: "User message template must be at least 3 characters long"}),
-    chainOfThoughRemovalRegex: z.string().refine((regex) => isRegexValid(regex), {message: "Invalid regex"}),
     dontIncludeDataviews: z.boolean(),
     maxPrefixCharLimit: z.number().int().min(MIN_MAX_CHAR_LIMIT, {message: `Max prefix char limit must be at least ${MIN_MAX_CHAR_LIMIT}`}).max(MAX_MAX_CHAR_LIMIT, {message: `Max prefix char limit must be at most ${MAX_MAX_CHAR_LIMIT}`}),
     maxSuffixCharLimit: z.number().int().min(MIN_MAX_CHAR_LIMIT, {message: `Max prefix char limit must be at least ${MIN_MAX_CHAR_LIMIT}`}).max(MAX_MAX_CHAR_LIMIT, {message: `Max prefix char limit must be at most ${MAX_MAX_CHAR_LIMIT}`}),
@@ -108,19 +78,10 @@ export const DEFAULT_SETTINGS: Settings = {
     // General settings
     enabled: true,
     advancedMode: false,
-    apiProvider: "openai",
-    // API settings
-    azureOAIApiSettings: {
-        key: "",
-        url: "https://YOUR_AOI_SERVICE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions",
-    },
-    openAIApiSettings: {
-        key: "",
-        url: "https://api.openai.com/v1/chat/completions",
-        model: "gpt-3.5-turbo",
-    },
+    apiProvider: "ollama",
+
     ollamaApiSettings: {
-        url: "http://localhost:11434/api/chat",
+        host: "localhost:11434",
         model: "",
     },
 
@@ -159,9 +120,10 @@ export const DEFAULT_SETTINGS: Settings = {
         frequency_penalty: 0.25,
         presence_penalty: 0,
         max_tokens: 800,
+        num_ctx: 1024,
     },
     // Prompt settings
-    systemMessage: `Your job is to predict the most logical text that should be written at the location of the <mask/>.
+    /* systemMessage: `Your job is to predict the most logical text that should be written at the location of the <mask/>.
 Your answer can be either code, a single word, or multiple sentences.
 If the <mask/> is in the middle of a partial sentence, your answer should only be the 1 or 2 words fixes the sentence and not the entire sentence.
 You are not allowed to have any overlapping text directly surrounding the <mask/>.  
@@ -170,25 +132,9 @@ Your response must have the following format:
 THOUGHT: here, you reason about the answer; use the 80/20 principle to be brief.
 LANGUAGE: here, you write the language of your answer, e.g. English, Python, Dutch, etc.
 ANSWER: here, you write the text that should be at the location of <mask/>
-`,
-    fewShotExamples: [
-        block_qoute_example,
-        codeblock_function_completion,
-        codeblock_function_parameters,
-        header_example,
-        numbered_list_example,
-        sub_task_list_example,
-        task_list_example,
-        text_completion_end,
-        text_completion_middle,
-        unordered_list_pro_and_con_list,
-        unordered_list_solid,
-        math_block_inline,
-        math_block_multi_line,
-        header_example_relu,
-    ].sort((a, b) => a.toString().localeCompare(b.toString())),
-    userMessageTemplate: "{{prefix}}<mask/>{{suffix}}",
-    chainOfThoughRemovalRegex: `(.|\\n)*ANSWER:`,
+`, */
+systemMessage: `Your job is to complete text inside a markdown file.
+Your text can be code, LaTex math surrounded by $ and $$ characters, a single word, or multiple sentences. Your answer must be in the same language as the text.`,
     // Preprocessing settings
     dontIncludeDataviews: true,
     maxPrefixCharLimit: 4000,

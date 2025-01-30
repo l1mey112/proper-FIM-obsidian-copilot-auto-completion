@@ -2,10 +2,8 @@ import * as React from "react";
 import {useState} from "react";
 import SettingsItem from "./SettingsItem";
 import {Notice} from "obsidian";
-import AzureOAIClient from "../../prediction_services/api_clients/AzureOAIClient";
-import OpenAIApiClient from "../../prediction_services/api_clients/OpenAIApiClient";
 import {Settings} from "../versions";
-import OllamaApiClient from "../../prediction_services/api_clients/OllamaApiClient";
+import { Ollama } from "ollama";
 
 interface IProps {
     settings: Settings;
@@ -27,17 +25,24 @@ export default function ConnectivityCheck(props: IProps): React.JSX.Element {
     }, [props.settings]);
 
     const createClient = () => {
-        if (props.settings.apiProvider === "azure") {
-            return AzureOAIClient.fromSettings(props.settings);
-        }
-        if (props.settings.apiProvider === "openai") {
-            return OpenAIApiClient.fromSettings(props.settings);
-        }
         if (props.settings.apiProvider === "ollama") {
-            return OllamaApiClient.fromSettings(props.settings);
+            //return OllamaApiClient.fromSettings(props.settings);
+            return new Ollama({
+                host: props.settings.ollamaApiSettings.host,
+            })
         }
         throw new Error("Unknown API provider");
     };
+
+    async function ollamaCheckIfConfiguredCorrectly(ollama: Ollama) {
+        try {
+            await ollama.list()
+        } catch (e) {
+            return [e.message]
+        }
+
+        return []
+    }
 
     const onClickConnectionButton = async () => {
         if (status === Status.Loading) {
@@ -46,8 +51,8 @@ export default function ConnectivityCheck(props: IProps): React.JSX.Element {
 
         setStatus(Status.Loading);
         try {
-            const client = createClient();
-            const _errors = await client.checkIfConfiguredCorrectly();
+            const ollama = createClient();
+            const _errors = await ollamaCheckIfConfiguredCorrectly(ollama);
             setErrors(_errors);
             if (_errors.length > 0) {
                 new Notice(

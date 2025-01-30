@@ -3,10 +3,10 @@ import { DocumentChanges } from "../render_plugin/document_changes_listener";
 import EventListener from "../event_listener";
 import { Notice } from "obsidian";
 import Context from "../context_detection";
+import { PredictionResponse, PredictionCancelable } from "src/prediction_services/types";
 
 class PredictingState extends State {
-    private predictionPromise: Promise<void> | null = null;
-    private isStillNeeded = true;
+    private prediction: Promise<PredictionCancelable> | null = null;
     private readonly prefix: string;
     private readonly suffix: string;
 
@@ -46,25 +46,24 @@ class PredictingState extends State {
     }
 
     private cancelPrediction(): void {
-        this.isStillNeeded = false;
+        if (this.prediction) {
+            this.prediction.then(prediction => prediction.abort())
+        }
         this.context.transitionToIdleState();
     }
 
     startPredicting(): void {
-        this.predictionPromise = this.predict();
+        this.prediction = this.context.predictionService?.fetchPredictions(
+            this.prefix,
+            this.suffix
+        )
+
+        this.prediction.then(prediction => this.predict(prediction.promise))
     }
 
-    private async predict(): Promise<void> {
+    private async predict(response: Promise<PredictionResponse>): Promise<void> {
 
-        const result =
-            await this.context.predictionService?.fetchPredictions(
-                this.prefix,
-                this.suffix
-            );
-
-        if (!this.isStillNeeded) {
-            return;
-        }
+        const result = await response
 
         if (result.isErr()) {
             new Notice(
@@ -76,13 +75,13 @@ class PredictingState extends State {
 
         const prediction = result.unwrapOr("");
 
-        if (prediction === "") {
+        // prediction was aborted or empty
+        if (prediction === null || prediction === "") {
             this.context.transitionToIdleState();
             return;
         }
         this.context.transitionToSuggestingState(prediction, this.prefix, this.suffix);
     }
-
 
     getStatusBarText(): string {
         return `Predicting for ${this.context.context}`;
