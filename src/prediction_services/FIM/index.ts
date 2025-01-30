@@ -173,7 +173,9 @@ class FIM implements PredictionService {
         }
 
         // create abortable promise
-        return { promise: streamer(), abort: stream.abort }
+        return { promise: streamer(), abort: () => {
+            stream.abort()
+        } }
     }
 
     private getSystemMessageFor(context: Context): string {

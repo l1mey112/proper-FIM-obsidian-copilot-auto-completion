@@ -51,6 +51,7 @@ class PredictingState extends State {
                 // can be null if the prediction was aborted
                 try {
                     if (prediction && prediction.abort) {
+                        console.log(prediction.abort)
                         prediction.abort()
                     }
                 } catch (e) {
@@ -62,9 +63,9 @@ class PredictingState extends State {
     }
 
     startPredicting(): void {
-        if (this.prediction) {
+        /* if (this.prediction) {
             this.cancelPrediction()
-        }
+        } */
         this.prediction = this.context.predictionService?.fetchPredictions(
             this.prefix,
             this.suffix
