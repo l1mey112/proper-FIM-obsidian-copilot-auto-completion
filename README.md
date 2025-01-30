@@ -11,6 +11,8 @@ The instruct tuned Qwen2.5 Coder models, work for LaTex, code, and completing te
 
 ![LaTeX autocomplete demonstration](assets/FIM-latex.png)
 
+Some default settings have been adjusted from the default, such as the system prompt. The delay has been set to 100ms and triggers completion on a single space ` ` character to make it feel more like Github Copilot.
+
 # Copilot like auto-completion for Obsidian
 This plugin adds a Copilot-like auto-completion to Obsidian.
 It uses large language models (LLMs) to generate text based on the `n` characters before and after your cursor.

@@ -87,6 +87,8 @@ export const DEFAULT_SETTINGS: Settings = {
 
     // Trigger settings
     triggers: [
+        // copilot like experience
+        {type: "string", value: " "},
         {type: "string", value: "# "},
         {type: "string", value: ". "},
         {type: "string", value: ": "},
@@ -112,7 +114,7 @@ export const DEFAULT_SETTINGS: Settings = {
         {type: "regex", value: "\\s*(-|[0-9]+\\.) \\[.\\]\\s+$"},
     ],
 
-    delay: 500,
+    delay: 100,
     // Request settings
     modelOptions: {
         temperature: 1,
@@ -134,7 +136,7 @@ LANGUAGE: here, you write the language of your answer, e.g. English, Python, Dut
 ANSWER: here, you write the text that should be at the location of <mask/>
 `, */
 systemMessage: `Your job is to complete text inside a markdown file.
-Your text can be code, LaTex math surrounded by $ and $$ characters, a single word, or multiple sentences. Your answer must be in the same language as the text.`,
+Your text can be code, LaTex math, a single word, or multiple sentences. Your answer must be in the same language as the text.`,
     // Preprocessing settings
     dontIncludeDataviews: true,
     maxPrefixCharLimit: 4000,
