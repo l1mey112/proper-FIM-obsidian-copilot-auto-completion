@@ -1,3 +1,16 @@
+# Copilot Ollama FIM auto-completion for Obisidan
+
+This project as been forked to work solely with Ollama's FIM [completion API](https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-completion), with some niceties such as
+
+- Aborting when a prompt is no longer needed (prompt stream),
+- Extra postprocessing to convert ugly notebook style LaTex delimiters (`\(`, `\)`, `\[`, `\]`) into Obsidian LaTex delimiters on the fly.
+
+This project has been fitted to ONLY work with Ollama's FIM, so things like few-shot examples are removed. The previous way completions were generated is trying to force a heavy prefix-mask-suffix instruct prompt onto a huge LLM when you can just use properly trained smally models for this task that actually support FIM.
+
+The instruct tuned Qwen2.5 Coder models, work for LaTex, code, and completing text perfectly. Set the cooldown to something low like 100ms, and use a 1.5B model for a very fast editing experience.
+
+![LaTeX autocomplete demonstration](assets/FIM-latex.png)
+
 # Copilot like auto-completion for Obsidian
 This plugin adds a Copilot-like auto-completion to Obsidian.
 It uses large language models (LLMs) to generate text based on the `n` characters before and after your cursor.
@@ -7,8 +20,6 @@ Additionally, you can press Escape or move the cursor to ignore the suggestion.
 The plugin supports multiple API providers, such as OpenAI, Azure OpenAI and Ollama.
 
 ![demo](assets/demo-static.gif)
-
-
 
 ## Features
 The plugin offers the following features:

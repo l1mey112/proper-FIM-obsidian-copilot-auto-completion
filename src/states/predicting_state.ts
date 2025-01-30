@@ -47,12 +47,24 @@ class PredictingState extends State {
 
     private cancelPrediction(): void {
         if (this.prediction) {
-            this.prediction.then(prediction => prediction.abort())
+            this.prediction.then(prediction => {
+                // can be null if the prediction was aborted
+                try {
+                    if (prediction && prediction.abort) {
+                        prediction.abort()
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            })
         }
         this.context.transitionToIdleState();
     }
 
     startPredicting(): void {
+        if (this.prediction) {
+            this.cancelPrediction()
+        }
         this.prediction = this.context.predictionService?.fetchPredictions(
             this.prefix,
             this.suffix

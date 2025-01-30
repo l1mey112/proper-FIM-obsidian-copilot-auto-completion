@@ -154,7 +154,7 @@ class FIM implements PredictionService {
             } catch (e) {
                 if (e instanceof Error && e.name === 'AbortError') {
                     if (this.debugMode) {
-                        console.log("Copilot aborted:", e);
+                        console.log("Copilot aborted");
                     }
 
                     return ok(null)
@@ -165,16 +165,6 @@ class FIM implements PredictionService {
 
             return err(new Error("Unexpected end of stream"))
         }
-
-        /* return new Promise(async (resolve, reject) => {
-            for await (const data of stream) {
-                if (data.isOk()) {
-                    resolve(ok(data.value));
-                } else {
-                    reject(data.error);
-                }
-            }
-        }) */
 
         if (this.debugMode) {
             console.log("Copilot messages send:\n", requestObject);
