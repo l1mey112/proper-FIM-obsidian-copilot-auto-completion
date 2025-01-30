@@ -3,7 +3,7 @@
 This project as been forked to work solely with Ollama's FIM [completion API](https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-completion), with some niceties such as
 
 - Aborting when a prompt is no longer needed (prompt stream),
-- Extra postprocessing to convert ugly notebook style LaTex delimiters (`\(`, `\)`, `\[`, `\]`) into Obsidian LaTex delimiters on the fly.
+- Extra [preprocessing](./src/prediction_services/pre_processors/convert_to_notebook_latex_math.ts) and postprocessing to convert ugly notebook style LaTex delimiters (`\(`, `\)`, `\[`, `\]`) into Obsidian LaTex delimiters on the fly.
 
 This project has been fitted to ONLY work with Ollama's FIM, so things like few-shot examples are removed. The previous way completions were generated is trying to force a heavy prefix-mask-suffix instruct prompt onto a huge LLM when you can just use properly trained smally models for this task that actually support FIM.
 

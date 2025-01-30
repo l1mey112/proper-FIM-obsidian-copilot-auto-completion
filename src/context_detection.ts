@@ -11,6 +11,8 @@ const INLINE_MATH_BLOCK_REGEX = /\$[\s\S]*?\$/g;
 const CODE_BLOCK_REGEX = /```[\s\S]*?```/g;
 const INLINE_CODE_BLOCK_REGEX = /`.*`/g;
 
+export const INLINED_MATH_BLOCK_OPENED = /\$[\s\S^\n]*?(\n|$)/g;
+
 enum Context {
     Text = "Text",
     Heading = "Heading",
@@ -19,6 +21,7 @@ enum Context {
     NumberedList = "NumberedList",
     CodeBlock = "CodeBlock",
     MathBlock = "MathBlock",
+    MathBlockOpen = "MathBlockOpen",
     TaskList = "TaskList",
 }
 
@@ -48,6 +51,9 @@ namespace Context {
         ) {
             return Context.MathBlock;
         }
+        if (isCursorInRegexBlock(prefix, suffix, INLINED_MATH_BLOCK_OPENED)) {
+            return Context.MathBlockOpen;
+        }
 
         if (isCursorInRegexBlock(prefix, suffix, CODE_BLOCK_REGEX) || isCursorInRegexBlock(prefix, suffix, INLINE_CODE_BLOCK_REGEX)) {
             return Context.CodeBlock;
@@ -72,7 +78,7 @@ namespace Context {
     }
 }
 
-function isCursorInRegexBlock(
+export function isCursorInRegexBlock(
     prefix: string,
     suffix: string,
     regex: RegExp

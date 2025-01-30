@@ -16,6 +16,7 @@ import RemoveWhitespace from "../post_processors/remove_whitespace";
 import {err, ok, Result} from "neverthrow";
 import { GenerateRequest, Ollama } from "ollama";
 import ConvertObsidianMathIndicators from "../post_processors/convert_to_obsidian_latex_math";
+import ConvertNotebookMathIndicators from "../pre_processors/convert_to_notebook_latex_math";
 
 class FIM implements PredictionService {
     private readonly ollama: Ollama;
@@ -55,7 +56,8 @@ class FIM implements PredictionService {
             new LengthLimiter(
                 settings.maxPrefixCharLimit,
                 settings.maxSuffixCharLimit
-            )
+            ),
+            new ConvertNotebookMathIndicators()
         );
 
         const postProcessors: PostProcessor[] = [];
@@ -199,10 +201,12 @@ class FIM implements PredictionService {
         if (context === Context.MathBlock) {
             return this.systemMessage + "\n\n" + "The text is located in a math block. Your answer must only contain LaTeX code that captures the math discussed in the surrounding text. No text or explaination only LaTex math code.";
         }
+        if (context === Context.MathBlockOpen) {
+            return this.systemMessage + "\n\n" + "The text is located in an opened math block. Your answer must only contain LaTeX code that captures the math discussed in the surrounding text. No text or explaination only LaTex math code, then close the block.";
+        }
         if (context === Context.TaskList) {
             return this.systemMessage + "\n\n" + "The text is located in a task list. Your answer must include one or more (sub)tasks that are logical given the other tasks and the surrounding text.";
         }
-
 
         return this.systemMessage;
 
