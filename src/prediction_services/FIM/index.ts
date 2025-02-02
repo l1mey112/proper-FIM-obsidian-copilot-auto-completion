@@ -53,11 +53,12 @@ class FIM implements PredictionService {
             preProcessors.push(new DataViewRemover());
         }
         preProcessors.push(
+            // length limiter should be last
+            new ConvertNotebookMathIndicators(),
             new LengthLimiter(
                 settings.maxPrefixCharLimit,
                 settings.maxSuffixCharLimit
             ),
-            new ConvertNotebookMathIndicators()
         );
 
         const postProcessors: PostProcessor[] = [];
